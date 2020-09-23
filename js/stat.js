@@ -4,8 +4,20 @@ const CLOUD_WIDTH = 420;
 const CLOUD_HEIGHT = 270;
 const CLOUD_X = 100;
 const CLOUD_Y = 10;
+const SHADOW_SHIFT = 10;
+const TEXT_LINE_HEIGHT = 20;
+const TEXT_SHIFT = 15;
 const FONT = `16px PT Mono`;
 const TITLE = `Ура вы победили! \nСписок результатов: `;
+const TITLE_Y = 20;
+const TITLE_X = 30;
+const statParams = {
+  topGap: 85,
+  barMaxHeight: 150,
+  barWidth: 40,
+  gap: 50,
+  currentPlayerColor: `rgba(255, 0, 0, 1)`,
+};
 
 const drawRect = (ctx, x, y, width, height, color) => {
   ctx.fillStyle = color;
@@ -14,7 +26,7 @@ const drawRect = (ctx, x, y, width, height, color) => {
 
 const renderCloud = (ctx, color, shadow) => {
   ctx.fillStyle = shadow;
-  drawRect(ctx, CLOUD_X + 10, CLOUD_Y + 10, CLOUD_WIDTH, CLOUD_HEIGHT);
+  drawRect(ctx, CLOUD_X + SHADOW_SHIFT, CLOUD_Y + SHADOW_SHIFT, CLOUD_WIDTH, CLOUD_HEIGHT);
 
   ctx.fillStyle = color;
   drawRect(ctx, CLOUD_X, CLOUD_Y, CLOUD_WIDTH, CLOUD_HEIGHT);
@@ -44,35 +56,32 @@ const getRandomNumber = (min, max) => {
   return Math.floor(randomNumber);
 };
 
+const getRandomBlueColor = () => {
+  return `hsl(237, ${getRandomNumber(10, 70)}%, ${getRandomNumber(10, 70)}%)`;
+};
+
 const renderTitle = (ctx, x, y, text) => {
   const titleLines = text.split(`\n`);
   titleLines.forEach((line) => {
     drawText(ctx, x, y, line);
-    y += 20;
+    y += TEXT_LINE_HEIGHT;
   });
 };
 
 window.renderStatistics = function (ctx, names, times) {
   const MAX_TIME = findMaxTime(times);
-  const statParams = {
-    barMaxHeight: 150,
-    barWidth: 40,
-    gap: 50,
-    currentPlayerColor: `rgba(255, 0, 0, 1)`
-  };
-
   let startX = CLOUD_X + statParams.gap;
-  let startY = CLOUD_Y + 85;
+  let startY = CLOUD_Y + statParams.topGap;
 
   renderCloud(ctx, `#fff`, `rgba(0, 0, 0, 0.7)`);
-  renderTitle(ctx, CLOUD_X + 30, CLOUD_Y + 20, TITLE);
+  renderTitle(ctx, CLOUD_X + TITLE_X, CLOUD_Y + TITLE_Y, TITLE);
 
   names.forEach((player, index) => {
     const isCurrentPlayer = (player === `Вы`);
     const barHeight = (statParams.barMaxHeight * times[index]) / MAX_TIME;
     const barY = startY + (statParams.barMaxHeight - barHeight);
 
-    ctx.fillStyle = isCurrentPlayer ? statParams.currentPlayerColor : `hsl(237, ${getRandomNumber(10, 70)}%, ${getRandomNumber(10, 70)}%)`;
+    ctx.fillStyle = isCurrentPlayer ? statParams.currentPlayerColor : getRandomBlueColor();
 
     drawRect(
         ctx,
@@ -84,13 +93,13 @@ window.renderStatistics = function (ctx, names, times) {
     drawText(
         ctx,
         startX,
-        CLOUD_HEIGHT - 15,
+        CLOUD_HEIGHT - TEXT_SHIFT,
         player
     );
     drawText(
         ctx,
         startX,
-        barY - 15,
+        barY - TEXT_SHIFT,
         Math.round(times[index])
     );
 
