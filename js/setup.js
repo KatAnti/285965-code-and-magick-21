@@ -1,17 +1,14 @@
 'use strict';
 
+const WIZARD_AMOUNT = 4;
 const userDialog = document.querySelector(`.setup`);
 const similarWizards = document.querySelector(`.setup-similar`);
 const similarWizardsContainer = document.querySelector(`.setup-similar-list`);
-const WIZARD_AMOUNT = 4;
 const fragment = document.createDocumentFragment();
-let wizards = [];
 const similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
   .content
   .querySelector(`.setup-similar-item`);
-
-userDialog.classList.remove(`hidden`);
-similarWizards.classList.remove(`hidden`);
+const wizards = [];
 
 const NAMES = [
   `Иван`,
@@ -53,13 +50,11 @@ const EYES_COLORS = [
 ];
 
 const getRandomInteger = (min, max) => {
-  const randomNumber = min + Math.random() * (max + 1 - min);
-  return Math.floor(randomNumber);
+  return Math.floor(min + Math.random() * (max + 1 - min));
 };
 
 const getRandomFeature = (arr) => {
-  const length = arr.length;
-  return arr[getRandomInteger(0, length - 1)];
+  return arr[getRandomInteger(0, arr.length - 1)];
 };
 
 const createWizard = () => {
@@ -70,10 +65,6 @@ const createWizard = () => {
     eyesColor: getRandomFeature(EYES_COLORS)
   };
 };
-
-for (let i = 0; i < WIZARD_AMOUNT; i++) {
-  wizards.push(createWizard());
-}
 
 const renderWizard = (wizard) => {
   const wizardElement = similarWizardTemplate.cloneNode(true);
@@ -94,6 +85,13 @@ const appendWizards = (wizardsArr) => {
   });
   similarWizardsContainer.append(fragment);
 };
+
+userDialog.classList.remove(`hidden`);
+similarWizards.classList.remove(`hidden`);
+
+for (let i = 0; i < WIZARD_AMOUNT; i++) {
+  wizards.push(createWizard());
+}
 
 appendWizards(wizards);
 
