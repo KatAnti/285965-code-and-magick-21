@@ -1,9 +1,18 @@
 'use strict';
 
 const WIZARD_AMOUNT = 4;
+const ESCAPE = `Escape`;
+const ENTER = `Enter`;
 const userDialog = document.querySelector(`.setup`);
 const similarWizards = document.querySelector(`.setup-similar`);
 const similarWizardsContainer = document.querySelector(`.setup-similar-list`);
+const userDialogOpen = document.querySelector(`.setup-open`);
+const userDialogClose = document.querySelector(`.setup-close`);
+const userDialogPlayer = document.querySelector(`.setup-player`);
+const userDialogPlayerName = document.querySelector(`input[name="username"]`);
+const coatColorInput = userDialogPlayer.querySelector(`input[name="coat-color"]`);
+const eyesColorInput = userDialogPlayer.querySelector(`input[name="eyes-color"]`);
+const fireballColorInput = userDialogPlayer.querySelector(`input[name="fireball-color"]`);
 const fragment = document.createDocumentFragment();
 const similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
   .content
@@ -49,6 +58,14 @@ const EYES_COLORS = [
   `green`
 ];
 
+const FIREBALL_COLORS = [
+  `#ee4830`,
+  `#30a8ee`,
+  `#5ce6c0`,
+  `#e848d5`,
+  `#e6e848`
+];
+
 const getRandomInteger = (min, max) => {
   return Math.floor(min + Math.random() * (max + 1 - min));
 };
@@ -86,7 +103,34 @@ const appendWizards = (wizardsArr) => {
   similarWizardsContainer.append(fragment);
 };
 
-userDialog.classList.remove(`hidden`);
+const onPopupEscPress = (evt) => {
+  if (evt.key === ESCAPE && userDialogPlayerName !== document.activeElement) {
+    evt.preventDefault();
+    closePopup();
+  }
+};
+
+const openPopup = () => {
+  userDialog.classList.remove(`hidden`);
+
+  document.addEventListener(`keydown`, onPopupEscPress);
+};
+
+const closePopup = () => {
+  userDialog.classList.add(`hidden`);
+
+  document.removeEventListener(`keydown`, onPopupEscPress);
+};
+
+const changeFeatureColor = (evt, newColor, input) => {
+  if (evt.target.matches(`.setup-fireball`)) {
+    evt.target.style.backgroundColor = newColor;
+  } else {
+    evt.target.style.fill = newColor;
+  }
+  input.value = newColor;
+};
+
 similarWizards.classList.remove(`hidden`);
 
 for (let i = 0; i < WIZARD_AMOUNT; i++) {
@@ -95,4 +139,36 @@ for (let i = 0; i < WIZARD_AMOUNT; i++) {
 
 appendWizards(wizards);
 
+userDialogOpen.addEventListener(`click`, () => {
+  openPopup();
+});
 
+userDialogOpen.addEventListener(`keydown`, (evt) => {
+  if (evt.key === ENTER) {
+    openPopup();
+  }
+});
+
+userDialogClose.addEventListener(`click`, () => {
+  closePopup();
+});
+
+userDialogClose.addEventListener(`keydown`, (evt) => {
+  if (evt.key === ENTER) {
+    closePopup();
+  }
+});
+
+userDialogPlayer.addEventListener(`click`, (evt) => {
+  if (evt.target && evt.target.matches(`.setup-wizard .wizard-coat`)) {
+    changeFeatureColor(evt, getRandomFeature(COAT_COLORS), coatColorInput);
+  }
+
+  if (evt.target && evt.target.matches(`.setup-wizard .wizard-eyes`)) {
+    changeFeatureColor(evt, getRandomFeature(EYES_COLORS), eyesColorInput);
+  }
+
+  if (evt.target && evt.target.matches(`.setup-fireball`)) {
+    changeFeatureColor(evt, getRandomFeature(FIREBALL_COLORS), fireballColorInput);
+  }
+});
