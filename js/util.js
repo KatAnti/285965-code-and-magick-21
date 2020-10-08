@@ -1,16 +1,6 @@
 'use strict';
 
 (() => {
-  const userDialog = document.querySelector(`.setup`);
-
-  const getRandomInteger = (min, max) => {
-    return Math.floor(min + Math.random() * (max + 1 - min));
-  };
-
-  const getRandomFeature = (arr) => {
-    return arr[window.util.getRandom(0, arr.length - 1)];
-  };
-
   const NAMES = [
     `Иван`,
     `Хуан Себастьян`,
@@ -57,6 +47,16 @@
     `#e848d5`,
     `#e6e848`
   ];
+
+  const userDialog = document.querySelector(`.setup`);
+
+  const getRandomInteger = (min, max) => {
+    return Math.floor(min + Math.random() * (max + 1 - min));
+  };
+
+  const getRandomFeature = (arr) => {
+    return arr[getRandomInteger(0, arr.length - 1)];
+  };
 
   window.util = {
     dialog: userDialog,
