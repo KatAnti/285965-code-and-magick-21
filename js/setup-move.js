@@ -32,7 +32,9 @@
       window.util.dialog.style.left = (window.util.dialog.offsetLeft - shift.x) + `px`;
     };
 
-    const onMouseup = () => {
+    const onMouseup = (upEvt) => {
+      upEvt.preventDefault();
+
       document.removeEventListener(`mousemove`, onMouseMove);
       document.removeEventListener(`mouseup`, onMouseup);
 
@@ -41,7 +43,7 @@
           clickEvt.preventDefault();
           document.removeEventListener(`click`, onClickPreventDefault);
         };
-        window.util.dialog.addEventListener(`click`, onClickPreventDefault);
+        dialogHandle.addEventListener(`click`, onClickPreventDefault);
       }
     };
 
