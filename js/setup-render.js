@@ -9,19 +9,10 @@
   const coatColorInput = userDialogPlayer.querySelector(`input[name="coat-color"]`);
   const eyesColorInput = userDialogPlayer.querySelector(`input[name="eyes-color"]`);
   const fireballColorInput = userDialogPlayer.querySelector(`input[name="fireball-color"]`);
+  const form = document.querySelector(`.setup-wizard-form`);
   const similarWizardTemplate = document.querySelector(`#similar-wizard-template`)
     .content
     .querySelector(`.setup-similar-item`);
-  const wizards = [];
-
-  const createWizard = () => {
-    return {
-      name: window.util.getFeature(window.util.names),
-      surname: window.util.getFeature(window.util.surnames),
-      coatColor: window.util.getFeature(window.util.coatColors),
-      eyesColor: window.util.getFeature(window.util.eyesColors)
-    };
-  };
 
   const renderWizard = (wizard) => {
     const wizardElement = similarWizardTemplate.cloneNode(true);
@@ -29,18 +20,11 @@
     const wizardEyes = wizardElement.querySelector(`.wizard-eyes`);
     const wizardName = wizardElement.querySelector(`.setup-similar-label`);
 
-    wizardEyes.style.fill = wizard.eyesColor;
-    wizardCoat.style.fill = wizard.coatColor;
-    wizardName.textContent = wizard.name + ` ` + wizard.surname;
+    wizardEyes.style.fill = wizard.colorEyes;
+    wizardCoat.style.fill = wizard.colorCoat;
+    wizardName.textContent = wizard.name;
 
     return wizardElement;
-  };
-
-  const appendWizards = (wizardsArr) => {
-    wizardsArr.forEach((wizard) => {
-      fragment.append(renderWizard(wizard));
-    });
-    similarWizardsContainer.append(fragment);
   };
 
   const changeFeatureColor = (evt, newColor, input) => {
@@ -50,6 +34,42 @@
       evt.target.style.fill = newColor;
     }
     input.value = newColor;
+  };
+
+  const onSubmitHandler = (evt) => {
+    evt.preventDefault();
+
+    window.backend.save(new FormData(form), () => {
+      window.util.dialog.classList.add(`hidden`);
+    }, errorHandler);
+  };
+
+  const successHandler = function (wizards) {
+    const randomWizards = [];
+
+    for (let i = 0; i < WIZARD_AMOUNT; i++) {
+      randomWizards.push(window.util.getRandom(0, wizards.length - 1));
+    }
+
+    randomWizards.forEach((wizardIndex) => {
+      fragment.appendChild(renderWizard(wizards[wizardIndex]));
+    });
+
+    similarWizardsContainer.appendChild(fragment);
+
+    similarWizards.classList.remove(`hidden`);
+  };
+
+  const errorHandler = (errorMessage) => {
+    const node = document.createElement(`div`);
+    node.style = `z-index: 100; margin: 0 auto; text-align: center; background-color: red;`;
+    node.style.position = `absolute`;
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = `30px`;
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement(`afterbegin`, node);
   };
 
   userDialogPlayer.addEventListener(`click`, (evt) => {
@@ -66,11 +86,7 @@
     }
   });
 
-  similarWizards.classList.remove(`hidden`);
+  window.backend.load(successHandler, errorHandler);
 
-  for (let i = 0; i < WIZARD_AMOUNT; i++) {
-    wizards.push(createWizard());
-  }
-
-  appendWizards(wizards);
+  form.addEventListener(`submit`, onSubmitHandler);
 })();
